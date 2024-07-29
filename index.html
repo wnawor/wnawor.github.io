@@ -1,35 +1,44 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
-<!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 
-<!-- Create a div where the graph will take place -->
 <body>
-<h1>Hello World</h1>
-<p>Doing stuff</p>
+<h1>Why are more points being scored in the modern NBA?</h1>
+<p>Over the past two decades, NBA average team points per game has been gradually increasing. 
+In this narrative visualization, we will attempt to figure out why.</p>
+<h3>NBA Team Average Points per Game by Season</h3>
 </body>
 <div id="my_dataviz"></div>
 <body>
-<p>Doing more stuff</p>
+<p>Many NBA believe that excess foul calls due to recent rule changes have lead to more points. 
+However, when looking at the average free throw attempts per game, we actually see a downward trend over time</p>
+<h3>NBA Team Average Free Throw Attempts per Game by Season</h3>
 </body>
 <div id="my_dataviz2"></div>
 <body>
-<p>Doing most stuff</p>
+<p>Looking past free throws, we can see that the increased reliance on 3 point shooting and faster pace is
+ the actual cause of the points per game increase</p>
+<h3>NBA Team Average 3 Point Attempts per Game (Left) and NBA Team Average Pace (Right) by Season</h3>
 </body>
 <div style="white-space: nowrap;">
     <div id="my_dataviz3" style="display: inline"></div>
     <div id="my_dataviz4" style="display: inline"></div>
 </div>
+<body>
+<p>Now it's your turn. Use the following drop down to see how shooting metrics have changed over time!</p>
+<h3>NBA Team Average Shooting Splits by Season</h3>
+</body>
+<select id="selectButton"></select>
+<div id="my_dataviz5"></div>
 
 <script>
 
-// set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+var margin = {top: 20, right: 20, bottom: 20, left: 30},
+    width = 500 - margin.left - margin.right,
+    height = 350 - margin.top - margin.bottom;
 
-// append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
   .append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -38,34 +47,49 @@ var svg = d3.select("#my_dataviz")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-//Read the data
 d3.csv("https://raw.githubusercontent.com/wnawor/wnawor.github.io/main/nba.csv", function(data) {
   console.log(data)
-  // Add X axis
   var x = d3.scaleLinear()
     .domain([2000, 2023])
     .range([ 0, width ]);
   svg.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
-
-  // Add Y axis
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+	
   var y = d3.scaleLinear()
     .domain([80, 130])
     .range([ height, 0]);
   svg.append("g")
     .call(d3.axisLeft(y));
 
-  // Add dots
   svg.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
+      .attr("stroke", "red")
       .attr("stroke-width", 1.5)
       .attr("d", d3.line()
         .x(function(d) { return x(d["Season"]) })
         .y(function(d) { return y(d["PTS"]) })
         )
+		
+const annotations = [
+  {
+    note: {
+      label: "Points per Game rose from 94.8 in 2000 to 114.2 in 2023"
+    },
+    x: 227,
+    y: 200,
+    dy: 30,
+    dx: 30,
+	color: "red"
+  }
+]
+
+const makeAnnotations = d3.annotation()
+  .annotations(annotations)
+svg
+  .append("g")
+  .call(makeAnnotations)
 	  
 var svg2 = d3.select("#my_dataviz2")
   .append("svg")
@@ -75,7 +99,6 @@ var svg2 = d3.select("#my_dataviz2")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-  // Add Y axis
   var y2 = d3.scaleLinear()
     .domain([20, 30])
     .range([ height, 0]);
@@ -87,13 +110,12 @@ var svg2 = d3.select("#my_dataviz2")
     .range([ 0, width ]);
   svg2.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x2));
+    .call(d3.axisBottom(x2).tickFormat(d3.format("d")));
 
-  // Add dots
   svg2.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
+      .attr("stroke", "blue")
       .attr("stroke-width", 1.5)
       .attr("d", d3.line()
         .x(function(d) { return x2(d["Season"]) })
@@ -108,7 +130,6 @@ var svg3 = d3.select("#my_dataviz3")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-  // Add Y axis
   var y3 = d3.scaleLinear()
     .domain([10, 40])
     .range([ height, 0]);
@@ -120,13 +141,12 @@ var svg3 = d3.select("#my_dataviz3")
     .range([ 0, width ]);
   svg3.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x3));
+    .call(d3.axisBottom(x3).tickFormat(d3.format("d")));
 
-  // Add dots
   svg3.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
+      .attr("stroke", "green")
       .attr("stroke-width", 1.5)
       .attr("d", d3.line()
         .x(function(d) { return x3(d["Season"]) })
@@ -141,7 +161,6 @@ var svg4 = d3.select("#my_dataviz4")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-  // Add Y axis
   var y4 = d3.scaleLinear()
     .domain([85, 105])
     .range([ height, 0]);
@@ -153,18 +172,86 @@ var svg4 = d3.select("#my_dataviz4")
     .range([ 0, width ]);
   svg4.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x4));
+    .call(d3.axisBottom(x4).tickFormat(d3.format("d")));
 
-  // Add dots
   svg4.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
+      .attr("stroke", "purple")
       .attr("stroke-width", 1.5)
       .attr("d", d3.line()
         .x(function(d) { return x4(d["Season"]) })
         .y(function(d) { return y4(d["Pace"]) })
         )
+
+
+var svg5 = d3.select("#my_dataviz5")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+    var allGroup = ["FT%", "FG%", "3P%", "TS%", "FT/FGA"]
+
+    d3.select("#selectButton")
+      .selectAll('myOptions')
+     	.data(allGroup)
+      .enter()
+    	.append('option')
+      .text(function (d) { return d; })
+      .attr("value", function (d) { return d; })
+
+
+    var x5 = d3.scaleLinear()
+      .domain([2000,2023])
+      .range([ 0, width ]);
+    svg5.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x5).tickFormat(d3.format("d")));
+
+    var y5 = d3.scaleLinear()
+      .domain( [0,1])
+      .range([ height, 0 ]);
+    svg5.append("g")
+      .call(d3.axisLeft(y5));
+	  
+
+    var line = svg5
+      .append('g')
+      .append("path")
+        .datum(data)
+        .attr("d", d3.line()
+          .x(function(d) { return x5(d["Season"]) })
+          .y(function(d) { return y5(d["FT%"]) })
+        )
+        .attr("stroke", "black" )
+        .style("stroke-width", 4)
+        .style("fill", "none")
+
+    function update(selectedGroup) {
+
+      line
+          .datum(data)
+          .transition()
+          .duration(1000)
+          .attr("d", d3.line()
+          .x(function(d) { return x5(d["Season"]) })
+          .y(function(d) { return y5(d[selectedGroup]) })
+          )
+        .attr("stroke", "black" )
+    }
+
+    d3.select("#selectButton").on("change", function(d) {
+        var selectedOption = d3.select(this).property("value")
+        update(selectedOption)
+    })
+
+
+
+
+
 
 })
 
