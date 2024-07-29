@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <meta charset="utf-8">
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 
 <!-- Create a div where the graph will take place -->
+<body>
+<h1>Hello World</h1>
+<p>Doing stuff</p>
+</body>
 <div id="my_dataviz"></div>
+<body>
+<p>Doing more stuff</p>
+</body>
+<div id="my_dataviz2"></div>
+
 
 <script>
 
@@ -25,11 +33,11 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 //Read the data
-d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv", function(data) {
-
+d3.csv("https://raw.githubusercontent.com/wnawor/wnawor.github.io/main/nba.csv", function(data) {
+  console.log(data)
   // Add X axis
   var x = d3.scaleLinear()
-    .domain([0, 4000])
+    .domain([2000, 2023])
     .range([ 0, width ]);
   svg.append("g")
     .attr("transform", "translate(0," + height + ")")
@@ -37,21 +45,54 @@ d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_data
 
   // Add Y axis
   var y = d3.scaleLinear()
-    .domain([0, 500000])
+    .domain([80, 130])
     .range([ height, 0]);
   svg.append("g")
     .call(d3.axisLeft(y));
 
   // Add dots
-  svg.append('g')
-    .selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-      .attr("cx", function (d) { return x(d.GrLivArea); } )
-      .attr("cy", function (d) { return y(d.SalePrice); } )
-      .attr("r", 1.5)
-      .style("fill", "#69b3a2")
+  svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x(d["Season"]) })
+        .y(function(d) { return y(d["PTS"]) })
+        )
+	  
+var svg2 = d3.select("#my_dataviz2")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // Add Y axis
+  var y2 = d3.scaleLinear()
+    .domain([10, 40])
+    .range([ height, 0]);
+  svg2.append("g")
+    .call(d3.axisLeft(y2));
+	
+  var x2 = d3.scaleLinear()
+    .domain([2000, 2023])
+    .range([ 0, width ]);
+  svg2.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x2));
+
+  // Add dots
+  svg2.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x2(d["Season"]) })
+        .y(function(d) { return y2(d["3PA"]) })
+        )
 
 })
 
